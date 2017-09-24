@@ -1,0 +1,23 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+**/*/bin/
+**/*/obj/
+**/*/packages/
+.vs/*
+
+*.suo
+*.user
+_ReSharper.*
+bin
+obj
+/packages/
+*.vs/
+/scaffolding.config
+node_modules/
+bower_components/
+dist/
+/.vscode
+*/UpgradeLog*.htm
+/npm-debug.log
