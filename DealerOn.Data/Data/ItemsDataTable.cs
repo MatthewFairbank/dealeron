@@ -1,19 +1,8 @@
 ﻿using System.Data;
+using DealerOn.Data.Enums;
 
 namespace DealerOn.Data.Data
 {
-    public enum ItemsColIndex
-    {
-        Input,
-        Name,
-        Qty,
-        Price,
-        BaseTax,
-        ImportTax,
-        IsTaxExempt,
-        IsImported,
-        Total
-    }
     public class ItemsDataTable : DataTable
     {
         public int InputIndex = 0;
@@ -25,6 +14,7 @@ namespace DealerOn.Data.Data
         public int IsTaxExemptIndex = 6;
         public int IsImportedIndex = 7;
         public int TotalIndex = 8;
+        public int TypeIndex = 9;
 
         public DataColumn Input = new DataColumn("Input", typeof(string));
         public DataColumn Name = new DataColumn("Name", typeof(string));
@@ -35,10 +25,11 @@ namespace DealerOn.Data.Data
         public DataColumn IsTaxExempt = new DataColumn("IsTaxExempt", typeof(bool));
         public DataColumn IsImported = new DataColumn("IsImported", typeof(bool));
         public DataColumn Total = new DataColumn("Total", typeof(decimal));
+        public DataColumn Type = new DataColumn("Type", typeof(ProductType));
         public ItemsDataTable()
         {
             this.TableName = "Items";
-            this.Columns.AddRange(new DataColumn[] { this.Input, this.Name, this.Qty, this.Price, this.BaseTax, this.ImportTax, this.IsTaxExempt, this.IsImported, this.Total });
+            this.Columns.AddRange(new DataColumn[] { this.Input, this.Name, this.Qty, this.Price, this.BaseTax, this.ImportTax, this.IsTaxExempt, this.IsImported, this.Total, this.Type });
         }
 
         //public void AddNewRow(Product p)

@@ -1,4 +1,5 @@
 ﻿using System;
+using DealerOn.Data.Enums;
 using DealerOn.Helpers;
 
 namespace DealerOn.Data.Entities
@@ -12,7 +13,7 @@ namespace DealerOn.Data.Entities
         public string Name { get; set; }
         public int Qty { get; set; }
         public decimal Price { get; set; }
-
+        public ProductType Type { get; set; }
         public decimal BaseTax
         {
             get => this._baseTax = this.IsTaxExempt ? 0 : CalculateBaseTax(this.Price);

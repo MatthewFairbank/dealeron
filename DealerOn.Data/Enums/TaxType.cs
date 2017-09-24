@@ -1,4 +1,4 @@
-﻿namespace DealerOn.SalesTax.Enums
+﻿namespace DealerOn.Data.Enums
 {
     public enum TaxType
     {

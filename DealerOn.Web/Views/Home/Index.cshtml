@@ -1,0 +1,109 @@
+﻿@using DealerOn.Data.Enums
+@using DealerOn.Web.Controllers
+@model DealerOn.Web.Controllers.SalesTaxViewModel
+@{
+    var types = (IList<string>)ViewData["types"] ?? new List<string>();
+    var typesList = new SelectList(types);
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>DealerOn - Sales Tax</title>
+    <link rel="stylesheet" href="/Content/bootstrap.min.css" />
+    <script type="text/javascript" src="/Scripts/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/Scripts/bootstrap.min.js"></script>
+</head>
+<body>
+    <header class="navbar navbar-inverse navbar-fixed-top">
+        <nav class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">
+                    DealerOn SalesTax
+                </a>
+            </div>
+        </nav>
+    </header>
+    <main class="container-fluid">
+        <div class="jumbotron">
+            <h1 class="page-header">DealerOn Sales Tax Problem Set</h1>
+            <p>Begin by entering shopping cart items, separating them by a new line. When ready, click the "Checkout" button and the application will attempt to parse the input. You will then be able to edit the data before creating a final receipt.</p>
+        </div>
+        <form action="/home/index" method="post" class="form-horizontal">
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="Input">
+                    Shopping Cart Input:
+                </label>
+                <div class="col-md-8 col-lg-6">
+                    @if (Model != null)
+                    {
+                        @Html.TextAreaFor(p => p.Input, new { @class = "form-control", rows = 5 })
+                    }
+                    else
+                    {
+                        <textarea class="form-control" rows="5" name="Input" Id="Input"></textarea>
+                    }
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12 col-lg-10">
+                    <div class="pull-right">
+                        <button class="btn btn-default">Cancel</button>
+                        <button class="btn btn-primary" type="submit">Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-md-12">
+                @if (Model != null && Model.Products.Any())
+                {
+                    <table class="table table-bordered table-condensed table-hover table-responsive">
+                        <thead>
+                        <tr>
+                            <th>Input</th>
+                            <th>Name</th>
+                            <th class="col-xs-1">Type</th>
+                            <th class="col-xs-1">Qty</th>
+                            <th>IsTaxExempt</th>
+                            <th>IsImported</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @for (var i = 0; i < Model.Products.Count(); i++)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.TextBoxFor(p => p.Products[i].Input, new { @class = "form-control" })
+                                </td>
+                                <td>
+                                    @Html.TextBoxFor(p => p.Products[i].Name, new { @class = "form-control" })
+                                </td>
+                                <td>
+                                    @Html.DropDownListFor(p => p.Products[i].Type, typesList, "Select", new { @class = "form-control" })
+                                </td>
+                                <td>@Html.TextBoxFor(p => p.Products[i].Qty, new { @class = "form-control" })</td>
+                                <td>@Html.CheckBoxFor(p => p.Products[i].IsTaxExempt)</td>
+                                <td>@Html.CheckBoxFor(p => p.Products[i].IsImported)</td>
+                                <td></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+            </div>
+            @if (Model != null && Model.Products.All(e => e.Type != ProductType.None))
+            {
+                <div class="col-md-12">
+                    <div class="form-group pull-right">
+                        <button type="button" class="btn btn-success">Print Receipt</button>
+                    </div>
+                </div>
+            }
+           
+        </div>
+    </main>
+</body>
+</html>

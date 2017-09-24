@@ -1,4 +1,5 @@
-﻿using DealerOn.Data.Data;
+﻿using System.Drawing;
+using DealerOn.Data.Data;
 
 namespace DealerOn.SalesTax
 {
@@ -31,13 +32,12 @@ namespace DealerOn.SalesTax
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ShoppingCartForm));
+            this.shoppingCartItemsLabel = new System.Windows.Forms.Label();
+            this.shoppingCartItems = new System.Windows.Forms.TextBox();
+            this.checkoutBtn = new System.Windows.Forms.Button();
+            this.cancelBtn = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.itemsDataTableBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.label2 = new System.Windows.Forms.Label();
             this.inputDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.qtyDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -47,46 +47,56 @@ namespace DealerOn.SalesTax
             this.isTaxExemptDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.isImportedDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.totalDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Type = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.itemsDataTableBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.totalItemsInCart = new System.Windows.Forms.Label();
+            this.totalItemsInCartLabel = new System.Windows.Forms.Label();
+            this.instructionsLabel = new System.Windows.Forms.Label();
+            this.completeBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemsDataTableBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
-            // label1
+            // shoppingCartItemsLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(55, 79);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(196, 25);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Shopping Cart Items:";
+            this.shoppingCartItemsLabel.AutoSize = true;
+            this.shoppingCartItemsLabel.Location = new System.Drawing.Point(11, 95);
+            this.shoppingCartItemsLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.shoppingCartItemsLabel.Name = "shoppingCartItemsLabel";
+            this.shoppingCartItemsLabel.Size = new System.Drawing.Size(139, 17);
+            this.shoppingCartItemsLabel.TabIndex = 1;
+            this.shoppingCartItemsLabel.Text = "Shopping Cart Items:";
             // 
-            // textBox1
+            // shoppingCartItems
             // 
-            this.textBox1.Location = new System.Drawing.Point(284, 79);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(771, 99);
-            this.textBox1.TabIndex = 1;
+            this.shoppingCartItems.Location = new System.Drawing.Point(14, 124);
+            this.shoppingCartItems.Margin = new System.Windows.Forms.Padding(2);
+            this.shoppingCartItems.Multiline = true;
+            this.shoppingCartItems.Name = "shoppingCartItems";
+            this.shoppingCartItems.Size = new System.Drawing.Size(562, 67);
+            this.shoppingCartItems.TabIndex = 2;
             // 
-            // button1
+            // checkoutBtn
             // 
-            this.button1.Location = new System.Drawing.Point(452, 212);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(127, 43);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Checkout";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Checkout_Click);
+            this.checkoutBtn.Location = new System.Drawing.Point(115, 206);
+            this.checkoutBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.checkoutBtn.Name = "checkoutBtn";
+            this.checkoutBtn.Size = new System.Drawing.Size(92, 29);
+            this.checkoutBtn.TabIndex = 3;
+            this.checkoutBtn.Text = "Checkout";
+            this.checkoutBtn.UseVisualStyleBackColor = true;
+            this.checkoutBtn.Click += new System.EventHandler(this.Checkout_Click);
             // 
-            // button2
+            // cancelBtn
             // 
-            this.button2.Location = new System.Drawing.Point(284, 212);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(133, 43);
-            this.button2.TabIndex = 4;
-            this.button2.Text = "Clear";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.Clear_Click);
+            this.cancelBtn.Location = new System.Drawing.Point(14, 206);
+            this.cancelBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.cancelBtn.Name = "cancelBtn";
+            this.cancelBtn.Size = new System.Drawing.Size(97, 29);
+            this.cancelBtn.TabIndex = 4;
+            this.cancelBtn.Text = "Clear";
+            this.cancelBtn.UseVisualStyleBackColor = true;
+            this.cancelBtn.Click += new System.EventHandler(this.Clear_Click);
             // 
             // dataGridView1
             // 
@@ -101,27 +111,15 @@ namespace DealerOn.SalesTax
             this.importTaxDataGridViewTextBoxColumn,
             this.isTaxExemptDataGridViewCheckBoxColumn,
             this.isImportedDataGridViewCheckBoxColumn,
-            this.totalDataGridViewTextBoxColumn});
+            this.totalDataGridViewTextBoxColumn,
+            this.Type});
             this.dataGridView1.DataSource = this.itemsDataTableBindingSource;
-            this.dataGridView1.Location = new System.Drawing.Point(60, 350);
+            this.dataGridView1.Location = new System.Drawing.Point(11, 282);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 31;
-            this.dataGridView1.Size = new System.Drawing.Size(1959, 150);
+            this.dataGridView1.Size = new System.Drawing.Size(1425, 58);
             this.dataGridView1.TabIndex = 5;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
-            // 
-            // itemsDataTableBindingSource
-            // 
-            this.itemsDataTableBindingSource.DataSource = typeof(DealerOn.Data.Data.ItemsDataTable);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(60, 319);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(23, 25);
-            this.label2.TabIndex = 6;
-            this.label2.Text = "0";
             // 
             // inputDataGridViewTextBoxColumn
             // 
@@ -182,20 +180,76 @@ namespace DealerOn.SalesTax
             this.totalDataGridViewTextBoxColumn.HeaderText = "Total";
             this.totalDataGridViewTextBoxColumn.Name = "totalDataGridViewTextBoxColumn";
             this.totalDataGridViewTextBoxColumn.ReadOnly = true;
+            this.totalDataGridViewTextBoxColumn.Visible = false;
+            // 
+            // Type
+            // 
+            this.Type.DataPropertyName = "Type";
+            this.Type.HeaderText = "Type";
+            this.Type.Name = "Type";
+            this.Type.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Type.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // itemsDataTableBindingSource
+            // 
+            this.itemsDataTableBindingSource.DataSource = typeof(DealerOn.Data.Data.ItemsDataTable);
+            // 
+            // totalItemsInCart
+            // 
+            this.totalItemsInCart.AutoSize = true;
+            this.totalItemsInCart.Location = new System.Drawing.Point(142, 253);
+            this.totalItemsInCart.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.totalItemsInCart.Name = "totalItemsInCart";
+            this.totalItemsInCart.Size = new System.Drawing.Size(16, 17);
+            this.totalItemsInCart.TabIndex = 7;
+            this.totalItemsInCart.Text = "0";
+            // 
+            // totalItemsInCartLabel
+            // 
+            this.totalItemsInCartLabel.AutoSize = true;
+            this.totalItemsInCartLabel.Location = new System.Drawing.Point(11, 253);
+            this.totalItemsInCartLabel.Name = "totalItemsInCartLabel";
+            this.totalItemsInCartLabel.Size = new System.Drawing.Size(126, 17);
+            this.totalItemsInCartLabel.TabIndex = 6;
+            this.totalItemsInCartLabel.Text = "Total Items in Cart:";
+            // 
+            // instructionsLabel
+            // 
+            this.instructionsLabel.AutoSize = true;
+            this.instructionsLabel.Location = new System.Drawing.Point(12, 22);
+            this.instructionsLabel.Name = "instructionsLabel";
+            this.instructionsLabel.Size = new System.Drawing.Size(742, 51);
+            this.instructionsLabel.TabIndex = 0;
+            this.instructionsLabel.Text = resources.GetString("instructionsLabel.Text");
+            // 
+            // completeBtn
+            // 
+            this.completeBtn.BackColor = System.Drawing.Color.MidnightBlue;
+            this.completeBtn.ForeColor = System.Drawing.Color.AliceBlue;
+            this.completeBtn.Location = new System.Drawing.Point(479, 206);
+            this.completeBtn.Name = "completeBtn";
+            this.completeBtn.Size = new System.Drawing.Size(97, 29);
+            this.completeBtn.TabIndex = 8;
+            this.completeBtn.Text = "Completed";
+            this.completeBtn.UseVisualStyleBackColor = false;
             // 
             // ShoppingCartForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2142, 1411);
-            this.Controls.Add(this.label2);
+            this.ClientSize = new System.Drawing.Size(1392, 697);
+            this.Controls.Add(this.completeBtn);
+            this.Controls.Add(this.instructionsLabel);
+            this.Controls.Add(this.totalItemsInCartLabel);
+            this.Controls.Add(this.totalItemsInCart);
             this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.cancelBtn);
+            this.Controls.Add(this.checkoutBtn);
+            this.Controls.Add(this.shoppingCartItems);
+            this.Controls.Add(this.shoppingCartItemsLabel);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ShoppingCartForm";
-            this.Text = "ShoppingCartForm";
+            this.Text = "Shopping Cart Form";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemsDataTableBindingSource)).EndInit();
             this.ResumeLayout(false);
@@ -205,13 +259,15 @@ namespace DealerOn.SalesTax
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label instructionsLabel;
+        private System.Windows.Forms.Label shoppingCartItemsLabel;
+        private System.Windows.Forms.TextBox shoppingCartItems;
+        private System.Windows.Forms.Button checkoutBtn;
+        private System.Windows.Forms.Button cancelBtn;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.BindingSource itemsDataTableBindingSource;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label totalItemsInCart;
+        private System.Windows.Forms.Label totalItemsInCartLabel;
         private System.Windows.Forms.DataGridViewTextBoxColumn inputDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn qtyDataGridViewTextBoxColumn;
@@ -221,5 +277,7 @@ namespace DealerOn.SalesTax
         private System.Windows.Forms.DataGridViewCheckBoxColumn isTaxExemptDataGridViewCheckBoxColumn;
         private System.Windows.Forms.DataGridViewCheckBoxColumn isImportedDataGridViewCheckBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn totalDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewComboBoxColumn Type;
+        private System.Windows.Forms.Button completeBtn;
     }
 }

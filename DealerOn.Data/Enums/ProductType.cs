@@ -1,7 +1,8 @@
-﻿namespace DealerOn.SalesTax.Enums
+﻿namespace DealerOn.Data.Enums
 {
     public enum ProductType
     {
+        None,
         Other,
         Book,
         Food,
