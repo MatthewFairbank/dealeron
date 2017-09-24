@@ -7,24 +7,53 @@ using System.Threading.Tasks;
 using DealerOn.Data.Data;
 using DealerOn.Data.Entities;
 using DealerOn.Data.Enums;
-using DealerOn.Helpers;
+using System.Data;
 
 namespace DealerOn.Business
 {
     public class ProductService
     {
-        private readonly ItemsDataTable _db = ShoppingCartDataSet.GetItemsTable();
+        private static ItemsDataTable _db;
 
-        //public void UpdateImportTaxCheck(int rowIndex, int colIndex, bool isImported)
-        //{
-        //    var price = StringHelper.ConvertColToDecimal(_db.Rows[rowIndex][colIndex].ToString());
-            
-        //}
-        public void UpdateItemType(int rowIndex, int colIndex, ProductType type)
+        public ProductService(ItemsDataTable db)
         {
+            _db = db;
         }
 
-        public static Product GetProductFromInput(MatchCollection matches)
+        public IList<DataRow> GetRows()
+        {
+            return _db.AsEnumerable().ToList();
+        }
+
+        public IList<IGrouping<string, DataRow>> GetGroupedRows()
+        {
+            var rows = _db.AsEnumerable()
+                .GroupBy(row => row.Field<string>("Name"))
+                .ToList();
+            return rows;
+        }
+
+        public void ClearRows()
+        {
+            _db.Rows.Clear();
+        }
+
+        public static readonly IList<Tuple<ProductType, string>> _exemptList = new List<Tuple<ProductType, string>>()
+        {
+            new Tuple<ProductType, string>(ProductType.Food, "choco"),
+            new Tuple<ProductType, string>(ProductType.Food, "chocolate bar"),
+            new Tuple<ProductType, string>(ProductType.Food, "box of chocolates"),
+            new Tuple<ProductType, string>(ProductType.Book, "book"),
+            new Tuple<ProductType, string>(ProductType.MedicalProduct, "pills")
+        };
+
+        public void AddProductRow(Product p)
+        {
+            _db.Rows.Add(p.Input, p.Name, p.Qty, p.Price, p.BaseTax, p.ImportTax, p.IsTaxExempt, p.IsImported,
+                p.Total);
+        }
+
+        public Product GetProductFromInput(MatchCollection matches)
         {
             var product = new Product();
             foreach (Match match in matches)
@@ -53,8 +82,25 @@ namespace DealerOn.Business
                     }
                 }
             }
+            if (!string.IsNullOrWhiteSpace(product.Name))
+            {
+                product.IsTaxExempt = _exemptList.Any(e => product.Name.ToLower().Contains(e.Item2));
+                product.Type = _exemptList.FirstOrDefault(e => product.Name.Contains(e.Item2))?.Item1 ??
+                               ProductType.None;
+                product.BaseTax = product.IsTaxExempt ? 0 : Product.CalculateBaseTax(product.Price);
+            }
             product.IsImported = product.Input?.ToLower().Contains("imported") ?? false;
+            product.ImportTax = product.IsImported ? Product.CalculateImportTax(product.Price) : 0;
+            product.Name = ParseName(product.Name);
+            //product.Total = product.Price + product.BaseTax + product.ImportTax;
             return product;
+        }
+
+        private static string ParseName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return name;
+            name = char.ToUpper(name[0]) + name.Substring(1);
+            return name.Trim();
         }
     }
 }

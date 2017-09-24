@@ -1,9 +1,6 @@
 ﻿@using DealerOn.Data.Enums
-@using DealerOn.Web.Controllers
-@model DealerOn.Web.Controllers.SalesTaxViewModel
+@model DealerOn.Web.Models.SalesTaxViewModel
 @{
-    var types = (IList<string>)ViewData["types"] ?? new List<string>();
-    var typesList = new SelectList(types);
 }
 <!DOCTYPE html>
 
@@ -30,79 +27,95 @@
             <h1 class="page-header">DealerOn Sales Tax Problem Set</h1>
             <p>Begin by entering shopping cart items, separating them by a new line. When ready, click the "Checkout" button and the application will attempt to parse the input. You will then be able to edit the data before creating a final receipt.</p>
         </div>
-        <form action="/home/index" method="post" class="form-horizontal">
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="Input">
-                    Shopping Cart Input:
-                </label>
-                <div class="col-md-8 col-lg-6">
-                    @if (Model != null)
-                    {
-                        @Html.TextAreaFor(p => p.Input, new { @class = "form-control", rows = 5 })
-                    }
-                    else
-                    {
-                        <textarea class="form-control" rows="5" name="Input" Id="Input"></textarea>
-                    }
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-12 col-lg-10">
-                    <div class="pull-right">
-                        <button class="btn btn-default">Cancel</button>
-                        <button class="btn btn-primary" type="submit">Checkout</button>
+        <div class="row">
+            <div class="col-md-8 col-md-push-2 col-lg-6 col-lg-push-3">
+                <form action="/home/index" method="post" class="form-horizontal">
+                    <div class="form-group @(Model != null && Model.Errors.Any() ? "has-error" : "")">
+                        <label class="col-md-12" for="Input">
+                            Shopping Cart Input:
+                        </label>
+                        <div class="col-md-12">
+                            @if (Model != null)
+                            {
+                                @Html.TextAreaFor(p => p.Input, new { @class = "form-control", rows = 5 })
+                            }
+                            else
+                            {
+                                <textarea class="form-control" rows="5" name="Input" Id="Input"></textarea>
+                            }
+                            @if (Model != null && Model.Errors.Any())
+                            {
+                                foreach (var error in Model.Errors)
+                                {
+                                    <span class="help-block">
+                                        @error
+                                    </span>
+                                }
+
+                            }
+                        </div>
                     </div>
-                </div>
-            </div>
-        </form>
-        <div class="row" style="margin-top: 20px;">
-            <div class="col-md-12">
-                @if (Model != null && Model.Products.Any())
-                {
-                    <table class="table table-bordered table-condensed table-hover table-responsive">
-                        <thead>
-                        <tr>
-                            <th>Input</th>
-                            <th>Name</th>
-                            <th class="col-xs-1">Type</th>
-                            <th class="col-xs-1">Qty</th>
-                            <th>IsTaxExempt</th>
-                            <th>IsImported</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @for (var i = 0; i < Model.Products.Count(); i++)
-                        {
-                            <tr>
-                                <td>
-                                    @Html.TextBoxFor(p => p.Products[i].Input, new { @class = "form-control" })
-                                </td>
-                                <td>
-                                    @Html.TextBoxFor(p => p.Products[i].Name, new { @class = "form-control" })
-                                </td>
-                                <td>
-                                    @Html.DropDownListFor(p => p.Products[i].Type, typesList, "Select", new { @class = "form-control" })
-                                </td>
-                                <td>@Html.TextBoxFor(p => p.Products[i].Qty, new { @class = "form-control" })</td>
-                                <td>@Html.CheckBoxFor(p => p.Products[i].IsTaxExempt)</td>
-                                <td>@Html.CheckBoxFor(p => p.Products[i].IsImported)</td>
-                                <td></td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                }
-            </div>
-            @if (Model != null && Model.Products.All(e => e.Type != ProductType.None))
-            {
-                <div class="col-md-12">
-                    <div class="form-group pull-right">
-                        <button type="button" class="btn btn-success">Print Receipt</button>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <button class="btn btn-default">Cancel</button>
+                            <button class="btn btn-primary" type="submit">Checkout</button>
+                        </div>
                     </div>
+                </form>
+                <div style="margin-top: 20px;">
+                    @if (Model != null && !Model.Errors.Any() && Model.GroupedProducts.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var products in Model.GroupedProducts)
+                            {
+                                if (products.Count() == 1)
+                                {
+                                    var product = products.First();
+                                    <div class="list-group-item">
+                                        @if (product.IsImported)
+                                        {
+                                            <span class="badge">
+                                                Import Tax
+                                            </span>
+                                        }
+                                        @if (product.IsTaxExempt)
+                                        {
+                                            <span class="badge">
+                                                Sales Tax Exempt: @product.Type.ToString()
+                                            </span>
+                                        }
+                                        @product.Name: @string.Format("${0:#0.00}", product.Total)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="list-group-item">
+                                        @if (products.First().IsImported)
+                                        {
+                                            <span class="badge">
+                                                Import Tax
+                                            </span>
+                                        }
+                                        @if (products.First().IsTaxExempt)
+                                        {
+                                            <span class="badge">
+                                                Sales Tax Exempt: @products.First().Type.ToString()
+                                            </span>
+                                        }
+                                        @products.First().Name: @string.Format("${0:#0.00}", products.Sum(e => e.Total)) (@products.Count() @@ @string.Format("${0:#0.00}", products.First().Total))
+                                    </div>
+                                }
+                            }
+                            <div class="list-group-item">
+                                <b>Sales Tax: $@string.Format("{0:#0.00}", Model.SalesTaxTotal)</b>
+                            </div>
+                            <div class="list-group-item">
+                                <b>Total: $@string.Format("{0:#0.00}", Model.Products.Sum(e=>e.Price) + Model.SalesTaxTotal)</b>
+                            </div>
+                        </div>
+                    }
                 </div>
-            }
-           
+            </div>
         </div>
     </main>
 </body>

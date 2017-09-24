@@ -14,7 +14,9 @@ namespace DealerOn.Helpers
 
         public static decimal Round(decimal basePrice, TaxType type)
         {
-            return Math.Round((basePrice * (type == TaxType.Base ? Base : Import)) * 20) / 20;
+            var proRatedPrice = basePrice * 20;
+            var taxAmount = type == TaxType.Base ? Base : Import;
+            return Math.Ceiling((proRatedPrice * taxAmount)) / 20;
         }
         public static decimal BaseWithTax(decimal shelfPrice)
         {

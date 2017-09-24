@@ -6,25 +6,14 @@ namespace DealerOn.Data.Entities
 {
     public class Product
     {
-        private decimal _baseTax = 0;
-        private decimal _importTax = 0;
         public long Id { get; set; } = DateTime.Now.Ticks;
         public string Input { get; set; }
         public string Name { get; set; }
         public int Qty { get; set; }
         public decimal Price { get; set; }
         public ProductType Type { get; set; }
-        public decimal BaseTax
-        {
-            get => this._baseTax = this.IsTaxExempt ? 0 : CalculateBaseTax(this.Price);
-            set => this._baseTax = value;
-        }
-
-        public decimal ImportTax
-        {
-            get => this._importTax = !this.IsImported ? 0 : CalculateImportTax(this.Price);
-            set => this._importTax = value;
-        }
+        public decimal BaseTax { get; set; }
+        public decimal ImportTax { get; set; }
         public bool IsTaxExempt { get; set; }
         public bool IsImported { get; set; } 
 

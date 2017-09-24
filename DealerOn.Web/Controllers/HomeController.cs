@@ -1,93 +1,93 @@
-﻿using DealerOn.Data.Entities;
-using DealerOn.Helpers;
+﻿using DealerOn.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
 using DealerOn.Business;
+using DealerOn.Data.Data;
+using DealerOn.Data.Enums;
+using DealerOn.Web.Models;
 
 namespace DealerOn.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IList<string> _types = new List<string>()
+        private static readonly ProductService _productSvc = new ProductService(ShoppingCartDataSet.GetItemsTable());
+
+        static readonly IList<ProductType> _productTypes = new List<ProductType>()
         {
-            "Book",
-            "Food",
-            "Medical Product",
-            "Other"
+            ProductType.None,
+            ProductType.Book,
+            ProductType.Food,
+            ProductType.MedicalProduct,
+            ProductType.Other
         };
+        private readonly List<SelectListItem> _types =
+            _productTypes.OrderBy(e => e).Select(t => new SelectListItem { Value = ((int)t).ToString(), Text = t.ToString() }).ToList();
+
         // GET: Home
         public ActionResult Index()
         {
-            ViewData["types"] = _types;
             return View();
         }
 
         [HttpPost]
         public ActionResult Index(SalesTaxViewModel model)
         {
-            ViewData["types"] = _types;
-            model.Inputs = StringHelper.SplitByNewLine(model.Input);
+            model.Errors.Clear();
+            ViewBag.TypesList = _types;
+            model.Inputs = StringHelper.SplitByNewLine(model.Input.Trim());
             foreach (var input in model.Inputs)
             {
-                var matches = RegexHelper.InputRegex.Matches(input);
-                var product = ProductService.GetProductFromInput(matches);
-                var productVm = ProductViewModel.ConvertTblProducts(product);
-                model.Products.Add(productVm);
+                try
+                {
+                    var matches = RegexHelper.InputRegex.Matches(input);
+                    var product = _productSvc.GetProductFromInput(matches);
+                    if (string.IsNullOrWhiteSpace(product.Name.Trim())) throw new NullReferenceException();
+                    var productVm = ProductViewModel.ConvertTblProducts(product);
+                    model.Products.Add(productVm);
+                }
+                catch (Exception ex)
+                {
+                    model.Errors.Add(
+                        $"Error: Sorry we could not parse the items.\r\nPlease make sure they are in a format of [Qty] [Description] [at] [Price]");
+                    return View(model);
+                }
             }
+
+            if (model.Products.Any())
+            {
+                decimal salesTax = 0;
+                decimal total = 0;
+                foreach (var rowGroup in model.GroupedProducts)
+                {
+                    if (rowGroup.Count() == 1)
+                    {
+                        var row = rowGroup.First();
+                        total += row.Price;
+                        salesTax += row.BaseTax;
+                        salesTax += row.ImportTax;
+                    }
+                    else
+                    {
+                        decimal salesTaxTotal = rowGroup.Sum(e => e.BaseTax);
+                        decimal importTaxTotal = rowGroup.Sum(e => e.ImportTax);
+                        decimal totalPrice = rowGroup.Sum(e => e.Total);
+                        total += totalPrice;
+                        salesTax += salesTaxTotal + importTaxTotal;
+                    }
+                }
+                total += salesTax;
+                model.SalesTaxTotal = salesTax;
+                model.Total = total;
+            }
+
             return View(model);
         }
-    }
 
-    public class SalesTaxViewModel
-    {
-        public string Input { get; set; }
-        public string[] Inputs { get; set; }
-        public IList<ProductViewModel> Products { get; set; } = new List<ProductViewModel>();
-
-
-    }
-
-    public class ProductViewModel : Product
-    {
-        public bool Editable { get; set; }
-
-        public static ProductViewModel ConvertTblProducts(Product p)
-        {
-            var vm = new ProductViewModel()
-            {
-                Input = p.Input,
-                Name = p.Name,
-                Qty = p.Qty,
-                Price = p.Price,
-                Type = p.Type,
-                IsImported = p.IsImported,
-                IsTaxExempt = p.IsTaxExempt,
-                BaseTax = p.BaseTax,
-                ImportTax = p.ImportTax,
-                Editable = false,
-            };
-            return vm;
-        }
-
-        public static Product ConvertProductViewModel(ProductViewModel p)
-        {
-            var product = new Product()
-            {
-                Input = p.Input,
-                Name = p.Name,
-                Qty = p.Qty,
-                Price = p.Price,
-                Type = p.Type,
-                IsImported = p.IsImported,
-                IsTaxExempt = p.IsTaxExempt,
-                BaseTax = p.BaseTax,
-                ImportTax = p.ImportTax
-            };
-            return product;
-        }
     }
 }
