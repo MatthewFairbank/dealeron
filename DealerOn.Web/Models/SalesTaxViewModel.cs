@@ -19,13 +19,12 @@ namespace DealerOn.Web.Models
         public static void CalculateViewModel(SalesTaxViewModel model)
         {
             decimal salesTax = 0;
-            decimal total = 0;
+            decimal total = model.Products.Sum(e => e.Price);
             foreach (var rowGroup in model.GroupedProducts)
             {
                 if (rowGroup.Count() == 1)
                 {
                     var row = rowGroup.First();
-                    total += row.Price;
                     salesTax += row.BaseTax;
                     salesTax += row.ImportTax;
                 }
@@ -33,8 +32,6 @@ namespace DealerOn.Web.Models
                 {
                     decimal salesTaxTotal = rowGroup.Sum(e => e.BaseTax);
                     decimal importTaxTotal = rowGroup.Sum(e => e.ImportTax);
-                    decimal totalPrice = rowGroup.Sum(e => e.Total);
-                    total += totalPrice;
                     salesTax += salesTaxTotal + importTaxTotal;
                 }
             }
