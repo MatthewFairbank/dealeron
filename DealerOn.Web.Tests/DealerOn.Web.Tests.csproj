@@ -63,6 +63,18 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DealerOn.Business\DealerOn.Business.csproj">
+      <Project>{0AAB3707-B7D5-4AD1-991B-BED19831D483}</Project>
+      <Name>DealerOn.Business</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DealerOn.Data\DealerOn.Data.csproj">
+      <Project>{D43424FC-7DC5-4EE2-BE59-3AD119752E76}</Project>
+      <Name>DealerOn.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DealerOn.Helpers\DealerOn.Helpers.csproj">
+      <Project>{2932C181-1460-42EB-B492-EC52DB054CB4}</Project>
+      <Name>DealerOn.Helpers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DealerOn.Web\DealerOn.Web.csproj">
       <Project>{7ADA421E-40CA-4D5A-9B76-B91622778149}</Project>
       <Name>DealerOn.Web</Name>

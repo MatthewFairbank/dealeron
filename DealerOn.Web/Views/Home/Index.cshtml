@@ -1,7 +1,4 @@
-﻿@using DealerOn.Data.Enums
-@model DealerOn.Web.Models.SalesTaxViewModel
-@{
-}
+﻿@model DealerOn.Web.Models.SalesTaxViewModel
 <!DOCTYPE html>
 
 <html>
@@ -25,7 +22,9 @@
     <main class="container-fluid">
         <div class="jumbotron">
             <h1 class="page-header">DealerOn Sales Tax Problem Set</h1>
-            <p>Begin by entering shopping cart items, separating them by a new line. When ready, click the "Checkout" button and the application will attempt to parse the input. You will then be able to edit the data before creating a final receipt.</p>
+            <p>Begin by entering shopping cart items, separating them by a new line. When ready, click the "Checkout" button and the application will attempt to parse the input.
+                <br/><strong>Please input the items in the following format: 1 [Item Description] at [Price]</strong> (ex: 1 imported bottle of perfume at 27.99)
+            </p>
         </div>
         <div class="row">
             <div class="col-md-8 col-md-push-2 col-lg-6 col-lg-push-3">
@@ -41,7 +40,7 @@
                             }
                             else
                             {
-                                <textarea class="form-control" rows="5" name="Input" Id="Input"></textarea>
+                                <textarea class="form-control" rows="5" name="Input" Id="Input" placeholder="ex: 1 imported bottle of perfume at 27.99"></textarea>
                             }
                             @if (Model != null && Model.Errors.Any())
                             {

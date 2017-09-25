@@ -8,6 +8,7 @@ using DealerOn.Data.Data;
 using DealerOn.Data.Entities;
 using DealerOn.Data.Enums;
 using System.Data;
+using DealerOn.Helpers;
 
 namespace DealerOn.Business
 {
@@ -93,6 +94,14 @@ namespace DealerOn.Business
             product.ImportTax = product.IsImported ? Product.CalculateImportTax(product.Price) : 0;
             product.Name = ParseName(product.Name);
             //product.Total = product.Price + product.BaseTax + product.ImportTax;
+            return product;
+        }
+
+        public Product ParseEachInput(string input)
+        {
+            var matches = RegexHelper.InputRegex.Matches(input);
+            var product = GetProductFromInput(matches);
+            if (string.IsNullOrWhiteSpace(product.Name.Trim())) throw new NullReferenceException();
             return product;
         }
 

@@ -9,6 +9,7 @@ using System.Web.Configuration;
 using System.Web.Mvc;
 using DealerOn.Business;
 using DealerOn.Data.Data;
+using DealerOn.Data.Entities;
 using DealerOn.Data.Enums;
 using DealerOn.Web.Models;
 
@@ -45,49 +46,55 @@ namespace DealerOn.Web.Controllers
             {
                 try
                 {
-                    var matches = RegexHelper.InputRegex.Matches(input);
-                    var product = _productSvc.GetProductFromInput(matches);
-                    if (string.IsNullOrWhiteSpace(product.Name.Trim())) throw new NullReferenceException();
+                    var product = _productSvc.ParseEachInput(input);
                     var productVm = ProductViewModel.ConvertTblProducts(product);
                     model.Products.Add(productVm);
                 }
                 catch (Exception ex)
                 {
                     model.Errors.Add(
-                        $"Error: Sorry we could not parse the items.\r\nPlease make sure they are in a format of [Qty] [Description] [at] [Price]");
+                        @"Error: Sorry we could not parse the items. Please make sure they are in the correct format.");
                     return View(model);
                 }
             }
 
             if (model.Products.Any())
             {
-                decimal salesTax = 0;
-                decimal total = 0;
-                foreach (var rowGroup in model.GroupedProducts)
-                {
-                    if (rowGroup.Count() == 1)
-                    {
-                        var row = rowGroup.First();
-                        total += row.Price;
-                        salesTax += row.BaseTax;
-                        salesTax += row.ImportTax;
-                    }
-                    else
-                    {
-                        decimal salesTaxTotal = rowGroup.Sum(e => e.BaseTax);
-                        decimal importTaxTotal = rowGroup.Sum(e => e.ImportTax);
-                        decimal totalPrice = rowGroup.Sum(e => e.Total);
-                        total += totalPrice;
-                        salesTax += salesTaxTotal + importTaxTotal;
-                    }
-                }
-                total += salesTax;
-                model.SalesTaxTotal = salesTax;
-                model.Total = total;
+                SalesTaxViewModel.CalculateViewModel(model);
+            }
+            else
+            {
+                model.Errors.Add(@"We did not find any items. Please make sure they are in the correct format.");
             }
 
             return View(model);
         }
 
+        public static void ConvertToViewModel(SalesTaxViewModel model)
+        {
+            decimal salesTax = 0;
+            decimal total = 0;
+            foreach (var rowGroup in model.GroupedProducts)
+            {
+                if (rowGroup.Count() == 1)
+                {
+                    var row = rowGroup.First();
+                    total += row.Price;
+                    salesTax += row.BaseTax;
+                    salesTax += row.ImportTax;
+                }
+                else
+                {
+                    decimal salesTaxTotal = rowGroup.Sum(e => e.BaseTax);
+                    decimal importTaxTotal = rowGroup.Sum(e => e.ImportTax);
+                    decimal totalPrice = rowGroup.Sum(e => e.Total);
+                    total += totalPrice;
+                    salesTax += salesTaxTotal + importTaxTotal;
+                }
+            }
+            total += salesTax;
+            model.SalesTaxTotal = salesTax;
+            model.Total = total;
+        }
     }
 }
